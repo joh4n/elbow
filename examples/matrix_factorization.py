@@ -54,14 +54,14 @@ def main():
     k = 3
     sparsity = 0.2
     nzr, nzc = sample_sparsity(n,m, sparsity)
-    print "sampled sparsity pattern has %d of %d entries nonzero" % (len(nzr), n*m)
+    print("sampled sparsity pattern has %d of %d entries nonzero" % (len(nzr), n*m))
     
     jm = sparse_model(nzr, nzc, n=n, m=m)
     sampled = jm.sample()
     jm["C"].observe(sampled["C"])
 
     mean_abs_err = np.mean(np.abs(sampled["C"]))
-    print "baseline (all zeroes) reconstructs observations with mean deviation %.3f" % (mean_abs_err)
+    print("baseline (all zeroes) reconstructs observations with mean deviation %.3f" % (mean_abs_err))
     
     """
     Reconstruction err for true latent traits.
@@ -70,7 +70,7 @@ def main():
     sB = sampled["B"]
     sC = np.dot(sA, sB.T)
     mean_abs_err = np.mean(np.abs(sC[nzr,nzc] - sampled["C"]))
-    print "true latent values reconstruct observations with mean deviation %.3f" % (mean_abs_err)
+    print("true latent values reconstruct observations with mean deviation %.3f" % (mean_abs_err))
 
     """
     Run inference and compute reconstruction err on the inferred
@@ -87,7 +87,7 @@ def main():
     qB = posterior["q_B"]["mean"]
     qC = np.dot(qA, qB.T)
     mean_abs_err_inferred = np.mean(np.abs(qC[nzr,nzc] - sampled["C"]))
-    print "inferred latent values reconstruct observations with mean deviation %.3f" % (mean_abs_err_inferred)
+    print("inferred latent values reconstruct observations with mean deviation %.3f" % (mean_abs_err_inferred))
 
 
 if __name__ == "__main__":

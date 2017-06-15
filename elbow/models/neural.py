@@ -13,7 +13,7 @@ def layer(inp, w, b):
     if len(inp.get_shape()) == 2:
         return tf.matmul(inp, w) + b
     else:
-        return tf.pack([tf.matmul(inp_slice, w) + b for inp_slice in tf.unpack(inp)])
+        return tf.stack([tf.matmul(inp_slice, w) + b for inp_slice in tf.unstack(inp)])
 
 def init_weights(shape, stddev=0.01):
     return tf.Variable(tf.random_normal(shape, stddev=stddev, dtype=tf.float32))
@@ -76,7 +76,7 @@ class NeuralGaussianTransform(DeterministicTransform):
         h1 = tf.nn.tanh(layer(X, w3, b3))
         mean = layer(h1, w4, b4)
         std = tf.exp(layer(h1, w5, b5))
-        return tf.pack([mean, std])
+        return tf.stack([mean, std])
 
     def default_q(self):
         return super(NeuralGaussianTransform, self).default_q(d_hidden=self.d_hidden, d_z=self.d_z)

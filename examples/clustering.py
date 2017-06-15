@@ -12,7 +12,7 @@ def clustering_gmm_model(n_clusters = 4,
 
     centers = Gaussian(mean=0.0, std=cluster_center_std, shape=(n_clusters, dim), name="centers")
     weights = DirichletMatrix(alpha=1.0,
-                              shape=(n_clusters,),
+                              shape=(n_clusters,1),
                               name="weights")
     X = GMMClustering(weights=weights, centers=centers,
                       std=cluster_spread_std, shape=(n_points, dim), name="X")
@@ -31,11 +31,11 @@ def main():
 
     weights = np.exp(posterior["q_weights"]["mean"])
     weights /= np.sum(weights)
-    print "sampled cluster weights", sampled["weights"]
-    print "inferred weights", weights
+    print("sampled cluster weights", sampled["weights"])
+    print("inferred weights", weights)
 
-    print "sampled cluster centers", sampled["centers"]
-    print "inferred cluster centers", posterior["q_centers"]["mean"]
+    print("sampled cluster centers", sampled["centers"])
+    print("inferred cluster centers", posterior["q_centers"]["mean"])
     
 if __name__ == "__main__":
     main()

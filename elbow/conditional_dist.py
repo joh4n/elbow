@@ -4,7 +4,7 @@ import tensorflow as tf
 import uuid
 
 
-from util.misc import concrete_shape, broadcast_shape
+from elbow.util.misc import concrete_shape, broadcast_shape
 
 
 class ConditionalDistribution(object):
@@ -116,13 +116,13 @@ class ConditionalDistribution(object):
             self._sampled=sample
             entropy = self._entropy(**kwargs)
         except Exception as e:
-            print e
+            print(e)
             return None, None
         
         return sample, entropy
     
     def sample(self, seed=0):
-        init = tf.initialize_all_variables()
+        init = tf.global_variables_initializer()
         tf.set_random_seed(seed)
 
         sess = tf.Session()
@@ -258,7 +258,7 @@ class WrapperNode(ConditionalDistribution):
         self.variance = tf.zeros_like(self.mean, name="variance")
         
     def inputs(self):
-        from parameterization import unconstrained
+        from elbow.parameterization import unconstrained
         return {"tf_value": unconstrained}
 
     def _input_shape(self, param, result, **kwargs):

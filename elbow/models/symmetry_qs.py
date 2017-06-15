@@ -159,17 +159,17 @@ class SignFlipGaussian(Gaussian):
                 # y ~ N(mean=alpha2, var=alpha2) are the Monte Carlo
                 # "variables", except here we construct them from
                 # the deterministic quadrature points x
-                y = tf.mul(tf.sqrt(alpha2),self.x) + alpha2
+                y = tf.multiply(tf.sqrt(alpha2),self.x) + alpha2
                 fs = -tf.log(.5*(1 + tf.exp(-2*y)))
 
                 # gauss-hermite quadrature is for integrals wrt e(-x^2); 
                 # adapting this to a Gaussian density requires a change of
                 # variables introducing a 1/sqrt(pi) factor. 
-                correction = tf.reduce_sum(tf.mul(fs, self.w)) / np.sqrt(np.pi)
+                correction = tf.reduce_sum(tf.multiply(fs, self.w)) / np.sqrt(np.pi)
 
                 trait_entropies.append(entropy + correction)
 
-        self.alpha2s = tf.pack(alpha2s)
+        self.alpha2s = tf.stack(alpha2s)
                 
         return tf.add_n(trait_entropies)
 
@@ -206,14 +206,14 @@ class ExplicitPermutationWrapper(ConditionalDistribution):
     
     def _logp(self, result, **kwargs):
                                         
-        cols = tf.unpack(result, axis=1)
+        cols = tf.unstack(result, axis=1)
         lps = []
         for perm_cols in itertools.permutations(cols):
-            permuted = tf.pack(perm_cols, axis=1)
+            permuted = tf.stack(perm_cols, axis=1)
             lp_base = self.dist._logp(permuted, **kwargs)
             lps.append(lp_base)
             
-        packed_lps = tf.pack(lps)
+        packed_lps = tf.stack(lps)
 
         self.cols = cols
         self.packed_lps = packed_lps
@@ -235,8 +235,8 @@ class ExplicitPermutationMixture(Gaussian):
         import itertools
 
         n, k = self.shape
-        col_means = tf.unpack(mean, axis=1)
-        col_stds = tf.unpack(std, axis=1)
+        col_means = tf.unstack(mean, axis=1)
+        col_stds = tf.unstack(std, axis=1)
 
         components = zip(col_means, col_stds)
 
@@ -245,16 +245,16 @@ class ExplicitPermutationMixture(Gaussian):
         self.perm_mean_list = []
         for perm in itertools.permutations(components):
             perm_means, perm_stds = zip(*perm)
-            perm_mean = tf.pack(perm_means, axis=1)
-            perm_std = tf.pack(perm_stds, axis=1)
+            perm_mean = tf.stack(perm_means, axis=1)
+            perm_std = tf.stack(perm_stds, axis=1)
 
-            print "perm", perm
+            print("perm", perm)
             self.perm_mean_list.append(perm_mean)
             
             lp = tf.reduce_sum(util.dists.gaussian_log_density(result, mean=perm_mean, stddev=perm_std))
             component_lps.append(lp)
 
-        component_lps = tf.pack(component_lps)
+        component_lps = tf.stack(component_lps)
 
         self.component_lps = component_lps
         

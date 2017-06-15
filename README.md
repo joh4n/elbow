@@ -21,8 +21,8 @@ A set of conditional distributions defines a joint distribution. We represent th
 m = Model(X) # automatically includes all ancestors of X
 sampled = m.sample()
 
-print "mu is", sampled["mu"]
-print "empirical mean is", np.mean(sampled["X"])
+print( "mu is", sampled["mu"])
+print("empirical mean is", np.mean(sampled["X"]))
 ```
 
 Now let's try running inference given the sampled data. To do this, we first specify a form for the variational posterior. We do this using the same `ConditionalDistribution` components as the object-level model. In this example, we'll let the posterior on X be a point mass at the observed values, and the posterior on mu be Gaussian. 

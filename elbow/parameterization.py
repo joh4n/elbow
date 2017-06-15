@@ -1,8 +1,8 @@
 import numpy as np
 import tensorflow as tf
 
-from util import concrete_shape
-from transforms import Simplex, Logit
+from elbow.util import concrete_shape
+from elbow.transforms import Simplex, Logit
 """
 Utility methods for defining constrained variables as transforms of an unconstrained parameterization. 
 """
@@ -127,8 +127,8 @@ def orthogonal_columns(shape=None, name=None, normalize=False, sort_columns=Fals
         cols.append(col)
         col_sqnorms.append(sqnorm)
 
-    orthog = tf.pack(cols, axis=1)
-    sqnorms = tf.pack(col_sqnorms)
+    orthog = tf.stack(cols, axis=1)
+    sqnorms = tf.stack(col_sqnorms)
 
     if normalize:
         return orthog / tf.sqrt(sqnorms)

@@ -39,9 +39,9 @@ class NoisyRandomProjection(ConditionalDistribution):
         cov = tf.matmul(Z, tf.transpose(Z)) + tf.diag(tf.ones(n,)*std) 
         L = tf.cholesky(cov)
         r = result - mu
-        out_cols = tf.unpack(r, axis=1)
+        out_cols = tf.unstack(r, axis=1)
         lps = [multivariate_gaussian_log_density(col, mu=0., L=L) for col in out_cols]
-        return tf.reduce_sum(tf.pack(lps))
+        return tf.reduce_sum(tf.stack(lps))
     
     def _entropy(self, Z, mu, std):
         n, d_output = self.shape
@@ -115,9 +115,9 @@ class InverseProjection(ConditionalDistribution):
     def _logp(self, result, X, W, mu, std):
         pred_z, L, std = self._build_inverse_projection(X, W, mu, std)
         
-        rows = tf.unpack(result - pred_z)
+        rows = tf.unstack(result - pred_z)
         lps = [multivariate_gaussian_log_density(r, mu=0, L_prec=L/std) for r in rows]
-        return tf.reduce_sum(tf.pack(lps))
+        return tf.reduce_sum(tf.stack(lps))
 
 
 class MeanFieldLinearGaussian(ConditionalDistribution):

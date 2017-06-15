@@ -1,11 +1,11 @@
 import numpy as np
 import tensorflow as tf
 
-import util
+import elbow.util as util
 
-from conditional_dist import ConditionalDistribution
-from parameterization import unconstrained, positive_exp, simplex_constrained, unit_interval, psd_matrix_small, psd_diagonal
-from transforms import Logit, Simplex1, Simplex, Exp, TransformedDistribution, RowNormalize
+from elbow.conditional_dist import ConditionalDistribution
+from elbow.parameterization import unconstrained, positive_exp, simplex_constrained, unit_interval, psd_matrix_small, psd_diagonal
+from elbow.transforms import Logit, Simplex1, Simplex, Exp, TransformedDistribution, RowNormalize
 
 import scipy.stats
 

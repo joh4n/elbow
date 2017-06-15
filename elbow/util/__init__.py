@@ -1,6 +1,7 @@
 import numpy as np
 import tensorflow as tf
 
-import dists
+from elbow.util.misc import *
+from elbow.util.special_hacks import *
+from elbow.util.dists import  *
 
-from misc import *

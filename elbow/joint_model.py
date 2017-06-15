@@ -1,3 +1,4 @@
+from __future__ import print_function
 import numpy as np
 import tensorflow as tf
 
@@ -5,8 +6,8 @@ import uuid
 import copy
 import time
 
-from transforms import DeterministicTransform
-from conditional_dist import ConditionalDistribution, WrapperNode
+from elbow.transforms import DeterministicTransform
+from elbow.conditional_dist import ConditionalDistribution, WrapperNode
 
 def ancestors(node):
     return set([node,] + [ancestor_node for inp in node.inputs_random.values() for ancestor_node in ancestors(inp)])
@@ -71,12 +72,12 @@ class Model(object):
             global_entropies = [n.entropy() for n in vnodes if not n.local]
             local_entropies = [n.entropy() for n in vnodes if n.local]
 
-            symmetry_correction = tf.reduce_sum(tf.pack([n._hack_symmetry_correction() for n in self.component_nodes]))
-            other_corrections = tf.reduce_sum(tf.pack(self.bonus_terms))
+            symmetry_correction = tf.reduce_sum(tf.stack([n._hack_symmetry_correction() for n in self.component_nodes]))
+            other_corrections = tf.reduce_sum(tf.stack(self.bonus_terms))
 
             
-            self.elp = tf.reduce_sum(tf.pack(global_elps)) + self.minibatch_ratio * tf.reduce_sum(tf.pack(local_elps))
-            self.entropy = tf.reduce_sum(tf.pack(global_entropies)) + self.minibatch_ratio * tf.reduce_sum(tf.pack(local_entropies))
+            self.elp = tf.reduce_sum(tf.stack(global_elps)) + self.minibatch_ratio * tf.reduce_sum(tf.stack(local_elps))
+            self.entropy = tf.reduce_sum(tf.stack(global_entropies)) + self.minibatch_ratio * tf.reduce_sum(tf.stack(local_entropies))
 
             self.elbo = self.elp + \
                         self.entropy + \
@@ -102,11 +103,11 @@ class Model(object):
                         
                     try:
                         inp_node.attach_q(q)
-                        print "attached inference network from  %s to input %s (%s)" % (n, inp_name, inp_node)
+                        print("attached inference network from  %s to input %s (%s)" % (n, inp_name, inp_node))
                         attached.append(inp_node)
                     except Exception as e:
                         import pdb; pdb.set_trace()
-                        print "WARNING: cannot attach inference network from %s to input %s (%s): %s" % (n, inp_name, inp_node, e)
+                        print("WARNING: cannot attach inference network from %s to input %s (%s): %s" % (n, inp_name, inp_node, e))
             i += 1
 
         for node in self.component_nodes:
@@ -126,7 +127,7 @@ class Model(object):
         # attach MAP (delta fn) Q distributions to every node in the model
         for n in self.component_nodes:
             if n._q_distribution is not None:
-                print "WARNING: %s already has attached Q distribution %s" % (n, n._q_distribution)
+                print("WARNING: %s already has attached Q distribution %s " % (n, n._q_distribution))
                 continue
 
             if not isinstance(n, DeterministicTransform):
@@ -180,7 +181,7 @@ class Model(object):
                 try:
                     d[name] = session.run(inp, feed_dict=self.feed_dict())
                 except Exception as e: # from fetching a placeholder
-                    print e
+                    print(e)
                     continue
             
             if len(d) > 0:
@@ -213,7 +214,7 @@ class Model(object):
         try:
             train_step = tf.train.AdamOptimizer(adam_rate).minimize(-elbo)
         except ValueError as e:
-            print e
+            print(e)
             return
             
         if debug:
@@ -239,7 +240,7 @@ class Model(object):
 
             elbo_val, elp_val, entropy_val = session.run((elbo, elp, entropy), feed_dict=fd)
             if print_s is not None and (time.time() - t) > print_s:
-                print "step %d elp %.2f entropy %.2f elbo %.2f" % (i, elp_val, entropy_val, elbo_val)
+                print("step %d elp %.2f entropy %.2f elbo %.2f" % (i, elp_val, entropy_val, elbo_val))
                 t = time.time()
                 
             i += 1

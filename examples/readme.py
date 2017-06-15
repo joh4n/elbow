@@ -14,15 +14,15 @@ def gaussian_mean_inference():
     m = Model(X)
     sampled = m.sample()
 
-    print "mu is", sampled["mu"]
-    print "empirical mean is", np.mean(sampled["X"])
+    print("mu is", sampled["mu"])
+    print("empirical mean is", np.mean(sampled["X"]))
 
     X.observe(sampled["X"])
     mu.attach_q(Gaussian(shape=mu.shape, name="q_mu"))
 
     m.train()
     posterior = m.posterior()
-    print "posterior on mu has mean %.2f and std %.2f" % (posterior["q_mu"]["mean"], posterior["q_mu"]["std"])
+    print("posterior on mu has mean %.2f and std %.2f" % (posterior["q_mu"]["mean"], posterior["q_mu"]["std"]))
 
 def custom_laplace():
     from elbow import ConditionalDistribution
@@ -56,7 +56,7 @@ def custom_laplace():
 
     m.train(steps=500)
     posterior = m.posterior()
-    print "sampled mu was %.2f; posterior has loc %.2f and scale %.2f" % (sampled["mu"], posterior["q_mu"]["loc"], posterior["q_mu"]["scale"])
+    print("sampled mu was %.2f; posterior has loc %.2f and scale %.2f" % (sampled["mu"], posterior["q_mu"]["loc"], posterior["q_mu"]["scale"]))
 
 
 gaussian_mean_inference()

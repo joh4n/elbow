@@ -1,10 +1,11 @@
+from __future__ import print_function
 import numpy as np
 import tensorflow as tf
 
 
-import util
-
-from conditional_dist import ConditionalDistribution
+# import elbow.util as util
+from elbow.util import shapes_equal, shape_is_scalar, extract_shape
+from elbow.conditional_dist import ConditionalDistribution
 
 
 class DeterministicTransform(ConditionalDistribution):
@@ -53,15 +54,17 @@ class UnaryTransform(DeterministicTransform):
             transformed = {}
             for inp_name, shape in A.input_shapes.items():
                 inp = getattr(A, inp_name)
-                if util.shapes_equal(shape, A.shape):
+                if shapes_equal(shape, A.shape):
+                # if util.shapes_equal(shape, A.shape):
                     transformed[inp_name] = transform.transform(inp)
-                elif util.shape_is_scalar(shape):
+                elif shape_is_scalar(shape):
+                # elif util.shape_is_scalar(shape):
                     transformed[inp_name] = inp
 
             try:
                 derived = A.derived_parameters(**transformed)
             except Exception as e:
-                print "could not derive additional parameters for structural transform %s of %s: %s" % (transform, A, e)
+                print("could not derive additional parameters for structural transform %s of %s: %s" % (transform, A, e))
                 derived = {}
 
             self.__dict__.update(transformed)
@@ -269,10 +272,10 @@ class RowNormalize(Transform):
     @classmethod
     def transform(cls, x_positive, return_log_jac=False, **kwargs):
         try:
-            n, k = util.extract_shape(x_positive)
+            n, k = extract_shape(x_positive)
             Z = tf.expand_dims(tf.reduce_sum(x_positive, axis=1), axis=1)
         except ValueError: # x is just a vector
-            k, = util.extract_shape(x_positive)
+            k, = extract_shape(x_positive)
             Z = tf.reduce_sum(x_positive)
             
         transformed = x_positive / Z
@@ -317,12 +320,12 @@ class RowNormalize1(Transform):
     @classmethod
     def transform(cls, x_positive, return_log_jac=False, **kwargs):
         try:
-            n, k = util.extract_shape(x_positive)
+            n, k = extract_shape(x_positive)
             ones = tf.ones((n,1))
             expanded = tf.concat(1, (x_positive, ones))
             Z = tf.expand_dims(tf.reduce_sum(expanded, axis=1), axis=1)
         except ValueError: # x is just a vector
-            k, = util.extract_shape(x_positive)
+            k, = extract_shape(x_positive)
             expanded = tf.concat(0, (x, 1))
             Z = tf.reduce_sum(expanded)
             
@@ -347,10 +350,10 @@ class RowNormalize1(Transform):
     def inverse(cls, transformed, return_log_jac=False, **kwargs):
 
         # first scale to have a unit column
-        cols = tf.unpack(transformed, axis=1)
+        cols = tf.unstack(transformed, axis=1)
         k = len(cols)
         last_col = cols[-1]
-        x = tf.pack( [col / last_col for col in cols[:-1]], axis=1)
+        x = tf.stack( [col / last_col for col in cols[:-1]], axis=1)
 
         if return_log_jac:
             log_jacobian = -(k-1) * tf.reduce_sum(tf.log(last_col))
@@ -533,7 +536,7 @@ def chain_transforms(*transforms):
                 else:
                     x = transform.transform(x, return_log_jac=return_log_jac)
             if return_log_jac:
-                return x, tf.reduce_sum(tf.pack(log_jacs))
+                return x, tf.reduce_sum(tf.stack(log_jacs))
             else:
                 return x
 

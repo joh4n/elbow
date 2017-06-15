@@ -121,41 +121,41 @@ def autoencoder():
 def main():
 
 
-    print "gaussian mean estimation"
+    print("gaussian mean estimation")
     model = gaussian_mean_model()
     posterior = model.train(steps=500)
-    print posterior
+    print(posterior)
 
-    print "gaussian matrix factorization"
+    print("gaussian matrix factorization")
     model = gaussian_lowrank_model()
     posterior = model.train(steps=500)
-    print posterior
+    print(posterior)
 
-    print "gaussian random walk"
+    print("gaussian random walk")
     model = gaussian_randomwalk_model()
     posterior = model.train(steps=1000)
-    print posterior
+    print(posterior)
     
-    print "gaussian mixture model"
+    print("gaussian mixture model")
     model = clustering_gmm_model()
     posterior = model.train(steps=1000)
-    print posterior
+    print(posterior)
 
 
-    print "latent features"
+    print("latent features")
     model = latent_feature_model()
     posterior = model.train(steps=1000)
-    print posterior
+    print(posterior)
 
-    print "bayesian sparsity"
+    print("bayesian sparsity")
     model = sparsity()
     posterior = model.train(steps=1000)
-    print posterior
+    print(posterior)
     
-    print "variational autoencoder"
+    print("variational autoencoder")
     model = autoencoder()
     posterior = model.train(steps=1000, adam_rate=0.001)
-    print posterior
+    print(posterior)
     
     
 if __name__ == "__main__":

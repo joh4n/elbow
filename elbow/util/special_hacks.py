@@ -29,7 +29,7 @@ def _test():
     y = tf.placeholder(dtype=tf.float32, name="y")
     betaln_z = betaln(x, y)
 
-    init = tf.initialize_all_variables()
+    init = tf.global_variables_initializer()
         
     sess = tf.Session()
     sess.run(init)
@@ -40,7 +40,7 @@ def _test():
 
         gamma_tf, = sess.run([gammaln_z,], feed_dict={z: z_val})
         gamma_scipy = scipy.special.gammaln(z_val)
-        print z_val, gamma_tf, gamma_scipy
+        print(z_val, gamma_tf, gamma_scipy)
 
     for i in range(10):
         # sample random input from lognormal distribution
@@ -49,7 +49,7 @@ def _test():
 
         beta_tf, = sess.run([betaln_z,], feed_dict={x: x_val, y: y_val})
         beta_scipy = scipy.special.betaln(x_val, y_val)
-        print x_val, y_val, beta_tf, beta_scipy
+        print(x_val, y_val, beta_tf, beta_scipy)
 
 if __name__ == "__main__":
     _test()

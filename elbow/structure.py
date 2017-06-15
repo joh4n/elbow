@@ -2,7 +2,7 @@ import tensorflow as tf
 import numpy as np
 
 from elbow import ConditionalDistribution
-from transforms import DeterministicTransform, UnaryTransform, Transform
+from elbow.transforms import DeterministicTransform, UnaryTransform, Transform
 
 class PackRVs(DeterministicTransform):
 
@@ -29,7 +29,7 @@ class PackRVs(DeterministicTransform):
 
     def _sample(self, **inputs):
         sorted_inputs = [v for (k, v) in sorted(inputs.items())]
-        return tf.pack(sorted_inputs)
+        return tf.stack(sorted_inputs)
 
     def _inference_networks(self, q_result):
         networks = {}
@@ -64,7 +64,7 @@ def unpack_transform(idx, axis=0):
     class Unpack(Transform):
         @classmethod
         def transform(cls, x, return_log_jac=False):
-            transformed = tf.unpack(x, axis=axis)[idx]
+            transformed = tf.unstack(x, axis=axis)[idx]
             if return_log_jac:
                 return transformed, 0.0
             else:

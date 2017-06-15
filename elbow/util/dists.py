@@ -1,8 +1,8 @@
 import numpy as np
 import tensorflow as tf
 
-from special_hacks import gammaln, betaln
-from misc import extract_shape
+from elbow.util.special_hacks import gammaln, betaln
+from elbow.util.misc import extract_shape
 import scipy.special
 
 
@@ -323,7 +323,7 @@ def bernoulli_log_density(x, p, clip_finite=True):
         lp = tf.log(p, name="bernoulli_logp")
         lp1 = tf.log(1.0-p, name="bernoulli_log1p")
         
-    log_probs = tf.mul(x, lp) + tf.mul(1-x, lp1)
+    log_probs = tf.multiply(x, lp) + tf.multiply(1-x, lp1)
     return log_probs
     
     

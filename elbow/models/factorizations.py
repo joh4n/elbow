@@ -241,7 +241,7 @@ class NoisySparseGaussianMatrixProduct(ConditionalDistribution):
             mB, vB = tf.gather(q_B.mean, col_idxs), tf.gather(q_B.variance, col_idxs)
         except Exception as e:
             # if any Q dists are missing or nongaussian
-            print "devolving to stochastic logp", e
+            print("devolving to stochastic logp", e)
             A = q_A._sampled if q_A is not None else self.inputs_nonrandom['A']
             B = q_B._sampled if q_B is not None else self.inputs_nonrandom['B']
             return self._logp(result=q_result._sampled, A=A, B=B, std=std, row_idxs=row_idxs, col_idxs=col_idxs, batch_mask=batch_mask)
@@ -521,7 +521,7 @@ class GMMClustering(ConditionalDistribution):
         total_logps = None
         
         # loop over clusters
-        for i, center in enumerate(tf.unpack(centers)):
+        for i, center in enumerate(tf.unstack(centers)):
             # compute vector of likelihoods that each point could be generated from *this* cluster
             cluster_lls = tf.reduce_sum(util.dists.gaussian_log_density(result, center, std), 1)
 

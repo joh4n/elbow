@@ -175,7 +175,7 @@ def sanity_check_model_recovery(structures, settings):
     samples = [build_model(structure, (N, D), settings).sample() for structure in structures]
         
     for i, sample in enumerate(samples):
-        print "using X sampled from", structures[i]
+        print("using X sampled from", structures[i)
 
         batch_N = 32
         
@@ -183,9 +183,9 @@ def sanity_check_model_recovery(structures, settings):
         for structure in structures:
             m = build_model(structure, (batch_N, D), settings, local=True)
             jm = Model()
-            print "built model for structure", repr(structure)
-            print "model is", m
-            print
+            print("built model for structure", repr(structure))
+            print("model is", m)
+            # print
             obsM = m.observe_placeholder()
 
             jm = Model(m, minibatch_ratio = N/float(batch_N))
@@ -197,13 +197,13 @@ def sanity_check_model_recovery(structures, settings):
             score = jm.monte_carlo_elbo(n_samples=settings.n_elbo_samples)
             scores.append((score))
 
-        print "results for sample from", structures[i]
+        print("results for sample from", structures[i])
         for structure, score in zip(structures, scores):
-            print structure, score
+            print(structure, score)
         best_structure = structures[np.argmax(scores)]
-        print "best structure", best_structure
+        print("best structure", best_structure)
         if best_structure != structures[i]:
-            print "WARNING DOES NOT MATCH TRUE STRUCTURE"
+            print("WARNING DOES NOT MATCH TRUE STRUCTURE")
     
 def main():
     from elbow import Model

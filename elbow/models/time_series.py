@@ -81,7 +81,7 @@ class LinearGaussian(ConditionalDistribution):
 
         transition_mean = tf.reshape(transition_mean, shape=(self.D, 1))
         transition_eps = tf.random_normal(shape=(self.T, self.D))
-        transition_epses = [tf.reshape(n, shape=(self.D, 1)) for n in tf.unpack(transition_eps)]
+        transition_epses = [tf.reshape(n, shape=(self.D, 1)) for n in tf.unstack(transition_eps)]
 
         prior_mean = tf.reshape(prior_mean, shape=(self.D, 1))
         prior_cov_L = tf.cholesky(prior_cov)
@@ -91,7 +91,7 @@ class LinearGaussian(ConditionalDistribution):
         if not self._flag_no_obs:
             observation_cov_L = tf.cholesky(observation_cov)
             obs_eps = tf.random_normal(shape=(self.T, self.K))
-            obs_epses = [tf.reshape(n, shape=(self.K, 1)) for n in tf.unpack(obs_eps)]
+            obs_epses = [tf.reshape(n, shape=(self.K, 1)) for n in tf.unstack(obs_eps)]
             observation_mean = tf.reshape(observation_mean, shape=(self.K, 1))
             
         output = []
@@ -109,7 +109,7 @@ class LinearGaussian(ConditionalDistribution):
                 state = tf.matmul(transition_mat, state) + state_noise
 
         self._sampled_hidden = hidden
-        return tf.pack(tf.squeeze(output))
+        return tf.stack(tf.squeeze(output))
     
     def _logp(self, result, prior_mean, prior_cov,
                  transition_mat, transition_mean, transition_cov,
@@ -127,7 +127,7 @@ class LinearGaussian(ConditionalDistribution):
         filtered_means = []
         filtered_covs = []
         step_logps = []
-        observations = tf.unpack(result)
+        observations = tf.unstack(result)
         for t in range(self.T):
             obs_t = tf.reshape(observations[t], (self.K, 1))
 
@@ -163,7 +163,7 @@ class LinearGaussian(ConditionalDistribution):
 
         self.filtered_means = filtered_means
         self.filtered_covs = filtered_covs
-        self.step_logps = tf.pack(step_logps)
+        self.step_logps = tf.stack(step_logps)
         logp = tf.reduce_sum(self.step_logps)
 
         return logp
@@ -195,8 +195,8 @@ class LinearGaussianChainCRF(ConditionalDistribution):
 
         T, d = self.shape
         
-        upwards_means = tf.unpack(unary_means)
-        upwards_vars = tf.unpack(unary_variances)
+        upwards_means = tf.unstack(unary_means)
+        upwards_vars = tf.unstack(unary_variances)
         unary_factors = [MVGaussianMeanCov(mean, tf.diag(vs)) for (mean, vs) in zip(upwards_means, upwards_vars)]
 
         # transition_matrices is either a d x d matrix, or a T x d x d tensor
@@ -256,7 +256,7 @@ class LinearGaussianChainCRF(ConditionalDistribution):
         samples = []
 
         T, d = self.shape
-        epses = tf.unpack(eps)
+        epses = tf.unstack(eps)
 
         sampling_dist = back_filtered[0]
         z_i = sampling_dist.sample(epses[0])
@@ -280,6 +280,6 @@ class LinearGaussianChainCRF(ConditionalDistribution):
         self.sampling_dists = sampling_dists
         self.entropies = entropies
 
-        entropy = tf.reduce_sum(tf.pack(entropies))
-        sample = tf.reshape(tf.squeeze(tf.pack(samples)), self.shape)
+        entropy = tf.reduce_sum(tf.stack(entropies))
+        sample = tf.reshape(tf.squeeze(tf.stack(samples)), self.shape)
         return sample, entropy

@@ -102,7 +102,7 @@ def list_derivations(depth, do_print=False):
 
     for d in derivations:
         if do_print:
-            print [pretty_print(s) for s in d]
+            print([pretty_print(s) for s in d])
 
     return derivations
 

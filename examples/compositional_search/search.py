@@ -77,7 +77,7 @@ def score_and_sort_beam(beam, X, settings):
     scored_beam = []
     for (structure, structure_logp, model_score) in beam:
         score = score_model(structure, X, settings) + structure_logp
-        print "score", score, "for structure", structure
+        print("score", score, "for structure", structure)
         scored_beam.append((structure, structure_logp, score))
     sorted_beam = sorted(scored_beam, key = lambda a : -a[2])
     return sorted_beam
@@ -109,7 +109,7 @@ def do_structure_search(X, settings):
         best_score = best_structures[0][2]
 
         i+=1
-        print "epoch %d" % i, "beam", best_structures
+        print("epoch %d" % i, "beam", best_structures)
     
 def main():
     N = 50
